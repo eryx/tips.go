@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	httpPort string = "9600"
+	httpPort string = "9050"
 )
 
 func ApiQuery(w http.ResponseWriter, r *http.Request) {
