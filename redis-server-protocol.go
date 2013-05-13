@@ -1,15 +1,15 @@
 package main
 
 import (
+    "crypto/rand"
     "fmt"
+    "io"
     "net"
+    "runtime"
     "strconv"
     "strings"
     "sync"
     "time"
-    "runtime"
-    "io"
-    "crypto/rand"
 )
 
 const AGENT_IOBUF_LEN = 32
@@ -19,16 +19,15 @@ const AGENT_QUIT = 10
 const AGENT_NET_PORT = "9051"
 
 type Agent struct {
-
     clients map[string]*AgentClient
 
     Lock sync.Mutex
 
-    ln net.Listener
+    ln  net.Listener
 }
 
 type AgentClient struct {
-    Sig       chan int
+    Sig chan int
     //Rep       *Reply
     WatchPath string
     Querybuf  []byte
@@ -52,7 +51,7 @@ func NewAgent(port string) *Agent {
 
     go func() {
 
-        if this.ln, err = net.Listen("tcp", ":"+ port); err != nil {
+        if this.ln, err = net.Listen("tcp", ":"+port); err != nil {
             // TODO
         }
 

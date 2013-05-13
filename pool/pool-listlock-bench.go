@@ -2,9 +2,9 @@ package main
 
 import (
     "container/list"
+    "fmt"
     "sync"
     "time"
-    "fmt"
 )
 
 type Pool struct {
@@ -41,7 +41,7 @@ func (this *Pool) push(c *GenConn) {
 }
 
 func (this *Pool) pull() (c *GenConn, err error) {
-    
+
     this.lock.Lock()
     defer this.lock.Unlock()
 
@@ -63,30 +63,30 @@ func (this *Pool) pull() (c *GenConn, err error) {
 }
 
 func main() {
-    
+
     pl := new(Pool)
     pl.available = 200
     pl.emptyCond = sync.NewCond(&pl.lock)
 
-    maxrequest  := 5000000
-    status      := make(chan int, 2)
-    start       := time.Now()
+    maxrequest := 5000000
+    status := make(chan int, 2)
+    start := time.Now()
 
     for i := 1; i <= maxrequest; i++ {
-        
+
         conn, _ := pl.pull()
-        
+
         go func(i int, conn *GenConn, pl *Pool) {
-            
+
             defer pl.push(conn)
-            
+
             if ret := conn.Call(i); ret == maxrequest {
-                status <-1
+                status <- 1
             }
-                   
+
         }(i, conn, pl)
     }
-    
+
     select {
     case <-status:
         fmt.Printf("Executed %v in %v\n", maxrequest, time.Since(start))
